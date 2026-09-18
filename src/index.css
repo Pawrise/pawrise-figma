@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+@import 'tailwindcss' source('./');
+
+/*
+ * Pawrise design tokens. Keep these names stable: they are the bridge between
+ * the prototype and the future Figma variables. Components should consume the
+ * semantic tokens below instead of introducing new hex values.
+ */
+:root {
+  --pw-color-brand-ink: #182d2b;
+  --pw-color-brand-lime: #c7ef72;
+  --pw-color-surface-page: #f5f8f4;
+  --pw-color-surface-card: #ffffff;
+  --pw-color-surface-elevated: #e8f0e9;
+  --pw-color-surface-secondary: #edf3ee;
+  --pw-color-surface-muted: #f0f4ef;
+  --pw-color-text-primary: #182d2b;
+  --pw-color-text-muted: #526864;
+  --pw-color-action: #265c4e;
+  --pw-color-action-text: #ffffff;
+  --pw-color-status-good: #176b4b;
+  --pw-color-status-good-surface: #e3f5eb;
+  --pw-color-status-watch: #805400;
+  --pw-color-status-watch-surface: #fff2cf;
+  --pw-color-status-alert: #a92c3c;
+  --pw-color-status-alert-surface: #fde9ec;
+  --pw-color-border: #dae4dc;
+  --pw-color-border-strong: #c4d2c8;
+  --pw-color-subtle: rgb(24 45 43 / 8%);
+  --pw-color-subtle-strong: rgb(24 45 43 / 15%);
+  --pw-color-avatar-backdrop: #e9f0e8;
+  --pw-color-map-ground: #e5efe7;
+  --pw-color-map-water: #d6eaf0;
+  --pw-color-map-park: #cde8d2;
+  --pw-color-map-block: #f9fbf8;
+  --pw-color-map-road: #ffffff;
+  --pw-color-map-line: #b7cfc0;
+  --pw-space-page: 16px;
+  --pw-space-section: 24px;
+  --pw-radius-card: 28px;
+  --pw-radius-control: 16px;
+  --pw-radius-pill: 999px;
+  --pw-font-display: 'Bricolage Grotesque', sans-serif;
+  --pw-font-body: 'Inter', sans-serif;
+  --pw-font-data: 'DM Mono', monospace;
+}
+
+@theme {
+  /* Brand */
+  --color-background: var(--pw-color-surface-page);
+  --color-foreground: var(--pw-color-text-primary);
+  --color-white: #ffffff;
+
+  --color-card: var(--pw-color-surface-card);
+  --color-card-foreground: var(--pw-color-text-primary);
+
+  --color-elevated: var(--pw-color-surface-elevated);
+  --color-secondary: var(--pw-color-surface-secondary);
+  --color-muted: var(--pw-color-surface-muted);
+  --color-muted-foreground: var(--pw-color-text-muted);
+
+  --color-primary: var(--pw-color-action);
+  --color-primary-foreground: var(--pw-color-action-text);
+  --color-accent: var(--pw-color-brand-lime);
+
+  --color-border: var(--pw-color-border);
+  --color-hairline: var(--pw-color-border-strong);
+  --color-ring: var(--pw-color-brand-lime);
+
+  /* Semantic status (kept distinct from the lime brand accent) */
+  --color-good: var(--pw-color-status-good);
+  --color-good-soft: var(--pw-color-status-good-surface);
+  --color-watch: var(--pw-color-status-watch);
+  --color-watch-soft: var(--pw-color-status-watch-surface);
+  --color-alert: var(--pw-color-status-alert);
+  --color-alert-soft: var(--pw-color-status-alert-surface);
+
+  --font-display: var(--pw-font-display);
+  --font-sans: var(--pw-font-body);
+  --font-mono: var(--pw-font-data);
+
+  --radius: 22px;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  button {
+    font-family: inherit;
+  }
+}
+
+/* App-shell scroll behavior: hide scrollbars until scrolling */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes pw-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pw-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pw-blink {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes pw-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pw-scan {
+  0%,
+  100% {
+    top: 15%;
+  }
+  50% {
+    top: 85%;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

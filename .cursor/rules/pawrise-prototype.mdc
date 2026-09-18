@@ -1,0 +1,15 @@
+---
+description: Rôle du dépôt Pawrise — prototype de démonstration, Figma et user stories
+alwaysApply: true
+---
+
+# Prototype Pawrise
+
+Ce dépôt prototype l’app mobile Pawrise pour **démontrer** le produit, produire un **prototype Figma** et des **user stories**.
+
+- Traiter l’interface comme le produit présenté au public, pas comme une maquette jetable.
+- Aucune base de données, API métier, auth, GPS matériel, LLM externe, e-mail ou paiement. Les données restent dans `localStorage`.
+- Ne pas proposer d’architecture backend, d’ORM, de sync cloud ou de « vraie » persistance.
+- Enrichir les écrans et `docs/USER_STORIES.md` plutôt que d’ajouter des couches techniques.
+- Conserver les jetons de `src/index.css` et `src/theme/tokens.json` : pont vers Figma.
+- Viewport téléphone, navigation par onglets, bottom sheets. Copie UI en **français**.

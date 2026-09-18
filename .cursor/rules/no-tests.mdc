@@ -1,0 +1,12 @@
+---
+description: Ne jamais générer de tests dans ce prototype
+alwaysApply: true
+---
+
+# Pas de tests
+
+Ne crée, n’ajoute et n’exécute pas de tests (Vitest, Testing Library, Playwright, snapshots, stories de test).
+
+Ce prototype sert à la démonstration, à Figma et aux user stories. Vérifier en parcourant l’UI.
+
+Ne pas ajouter de scripts de test, de config de runner, ni de dépendances de test.
