@@ -1,0 +1,14 @@
+---
+description: Conventions React + Tailwind du scaffold Figma Make
+globs: src/**/*.{ts,tsx,css}
+alwaysApply: false
+---
+
+# UI Pawrise (Figma Make)
+
+- Composants en **default export**.
+- Chaînes avec apostrophe : doubles quotes (`"l'app"`) ou échappement. Une apostrophe non échappée casse le build.
+- JSX fermé, accolades équilibrées.
+- Styles : utilitaires Tailwind v4 dans le JSX. Thème et polices dans `src/index.css` (`@import` en premier, puis `@font-face` / `@theme`).
+- Pas de fichier Tailwind config ni PostCSS. Alias `@` → `src/`.
+- Pas de nouveau hex : réutiliser les jetons sémantiques (`background`, `primary`, `good`, `watch`, `alert`).

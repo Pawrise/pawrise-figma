@@ -1,0 +1,18 @@
+---
+description: Copie produit — pas de fake ; un seul bouton d’alerte pour la démo
+alwaysApply: true
+---
+
+# Copie et démonstration
+
+Ne jamais dire que l’app, les données, le collier, la carte, le chat ou les rendez-vous sont fake, fictifs, simulés, scolaires ou « non réels ». On prototype et on démontre.
+
+Formulations à éviter : fake, mock (dans l’UI), dummy, simulé, fictif, démo collée au libellé (« rendez-vous simulé »), « aucun X réel », « données de démonstration » dans les bulles.
+
+Dire plutôt le produit : collier connecté, rendez-vous confirmé, invitation envoyée, dernières mesures reçues.
+
+## Unique contrôle d’incident
+
+Un seul bouton bascule **Tout va bien** ↔ **Alerte** : l’icône d’alerte en haut à droite de la carte Santé (`HealthScreen`). Ne pas ajouter d’autres « Simuler une sortie », « signal faible », « déconnexion », etc.
+
+Les parcours collier, QR, chat et vétérinaire se présentent comme le produit. « Réinitialiser la démonstration » dans Paramètres est le seul libellé explicitement destiné au présentateur.
