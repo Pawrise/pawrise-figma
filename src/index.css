@@ -7,34 +7,34 @@
  * semantic tokens below instead of introducing new hex values.
  */
 :root {
-  --pw-color-brand-ink: #182d2b;
-  --pw-color-brand-lime: #c7ef72;
-  --pw-color-surface-page: #f5f8f4;
+  --pw-color-brand-ink: #123044;
+  --pw-color-brand-lime: #14a3a8;
+  --pw-color-surface-page: #f4f8fb;
   --pw-color-surface-card: #ffffff;
-  --pw-color-surface-elevated: #e8f0e9;
-  --pw-color-surface-secondary: #edf3ee;
-  --pw-color-surface-muted: #f0f4ef;
-  --pw-color-text-primary: #182d2b;
-  --pw-color-text-muted: #526864;
-  --pw-color-action: #265c4e;
+  --pw-color-surface-elevated: #e5f1f7;
+  --pw-color-surface-secondary: #eef5f8;
+  --pw-color-surface-muted: #f3f7fa;
+  --pw-color-text-primary: #123044;
+  --pw-color-text-muted: #5a7082;
+  --pw-color-action: #0a5c78;
   --pw-color-action-text: #ffffff;
-  --pw-color-status-good: #176b4b;
-  --pw-color-status-good-surface: #e3f5eb;
-  --pw-color-status-watch: #805400;
-  --pw-color-status-watch-surface: #fff2cf;
-  --pw-color-status-alert: #a92c3c;
-  --pw-color-status-alert-surface: #fde9ec;
-  --pw-color-border: #dae4dc;
-  --pw-color-border-strong: #c4d2c8;
-  --pw-color-subtle: rgb(24 45 43 / 8%);
-  --pw-color-subtle-strong: rgb(24 45 43 / 15%);
-  --pw-color-avatar-backdrop: #e9f0e8;
-  --pw-color-map-ground: #e5efe7;
-  --pw-color-map-water: #d6eaf0;
-  --pw-color-map-park: #cde8d2;
-  --pw-color-map-block: #f9fbf8;
+  --pw-color-status-good: #0e7c74;
+  --pw-color-status-good-surface: #e4f6f4;
+  --pw-color-status-watch: #8a5a00;
+  --pw-color-status-watch-surface: #fff4d8;
+  --pw-color-status-alert: #b4233a;
+  --pw-color-status-alert-surface: #fdecee;
+  --pw-color-border: #d5e3ec;
+  --pw-color-border-strong: #c1d4e0;
+  --pw-color-subtle: rgb(18 48 68 / 8%);
+  --pw-color-subtle-strong: rgb(18 48 68 / 15%);
+  --pw-color-avatar-backdrop: #e4f0f6;
+  --pw-color-map-ground: #e6eef3;
+  --pw-color-map-water: #c5e6f2;
+  --pw-color-map-park: #d4ebe6;
+  --pw-color-map-block: #f7fbfd;
   --pw-color-map-road: #ffffff;
-  --pw-color-map-line: #b7cfc0;
+  --pw-color-map-line: #b7cdd8;
   --pw-space-page: 16px;
   --pw-space-section: 24px;
   --pw-radius-card: 28px;
@@ -67,7 +67,7 @@
   --color-hairline: var(--pw-color-border-strong);
   --color-ring: var(--pw-color-brand-lime);
 
-  /* Semantic status (kept distinct from the lime brand accent) */
+  /* Semantic status — teal for stable, amber and red kept distinct */
   --color-good: var(--pw-color-status-good);
   --color-good-soft: var(--pw-color-status-good-surface);
   --color-watch: var(--pw-color-status-watch);

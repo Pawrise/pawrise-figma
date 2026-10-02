@@ -14,7 +14,7 @@ export type VetClinic = {
 }
 
 export type EmergencyFilter = "all" | "emergency"
-export type PartnerFilter = "all" | "partner" | "other"
+export type PartnerFilter = "all" | "partner"
 export type VetSort = "distance" | "soonest"
 
 export const vets: VetClinic[] = [
@@ -139,7 +139,6 @@ export function filterAndSortVets(
 ) {
   let filtered = filter === "emergency" ? list.filter((vet) => vet.emergency) : list
   if (partnerFilter === "partner") filtered = filtered.filter((vet) => vet.partner)
-  if (partnerFilter === "other") filtered = filtered.filter((vet) => !vet.partner)
   return [...filtered].sort((a, b) => {
     if (sort === "distance") return a.distanceKm - b.distanceKm
     const slotA = nextSlot(a, booked, now)

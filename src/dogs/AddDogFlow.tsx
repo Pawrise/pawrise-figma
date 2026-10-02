@@ -31,7 +31,7 @@ type StepKey = (typeof STEPS)[number]
 
 type Phase = "profile" | "collarIntro" | "scan" | "manual" | "activating" | "success"
 
-export default function AddDogFlow() {
+export default function AddDogFlow({ onLeave, onComplete }: { onLeave?: () => void; onComplete?: () => void }) {
   const { addDog, setAddingDog, setTab, dogs } = useApp()
   const [form, setForm] = useState<Form>({
     photo: "",
@@ -61,7 +61,7 @@ export default function AddDogFlow() {
     if (phase === "manual" || phase === "scan") return setPhase("collarIntro")
     if (phase === "collarIntro") return setPhase("profile")
     if (phase === "profile" && i > 0) return setI((n) => n - 1)
-    if (phase === "profile" && i === 0) return setAddingDog(false)
+    if (phase === "profile" && i === 0) return onLeave ? onLeave() : setAddingDog(false)
   }
 
   const next = () => {
@@ -95,6 +95,7 @@ export default function AddDogFlow() {
     }
     addDog(newDog)
     setAddingDog(false)
+    onComplete?.()
     setTab("health")
   }
 
@@ -130,7 +131,7 @@ export default function AddDogFlow() {
         )}
 
         <button
-          onClick={() => setAddingDog(false)}
+          onClick={() => (onLeave ? onLeave() : setAddingDog(false))}
           aria-label="Fermer"
           className="flex h-9 w-9 items-center justify-center rounded-full bg-card text-muted-foreground active:scale-95"
         >
