@@ -1,5 +1,14 @@
 // Shared Pawrise seed data — one source of truth for dogs across all features.
 
+export type OwnerRole = "chief" | "secondary";
+
+export type DogOwner = {
+  name: string;
+  email: string;
+  role: OwnerRole;
+  pending?: boolean;
+};
+
 export type Dog = {
   id: string;
   name: string;
@@ -10,7 +19,8 @@ export type Dog = {
   weight?: number; // kg
   height?: number; // cm
   medical?: string;
-  coOwners?: string[]; // emails of invited co-owners (pending/accepted)
+  coOwners?: string[]; // legacy pending invitation emails
+  owners?: DogOwner[];
   photo: string;
   collarId: string;
   connected: boolean;
@@ -32,6 +42,9 @@ export const initialDogs: Dog[] = [
     collarId: "PW-C2 · 8A4F",
     connected: true,
     battery: 72,
+    owners: [
+      { name: "Léa Moreau", email: "lea.moreau@email.com", role: "secondary" },
+    ],
   },
 ];
 

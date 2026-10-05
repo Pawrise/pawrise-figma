@@ -30,6 +30,8 @@ export type AppState = {
   // App owner profile.
   user: UserProfile;
   setUser: (patch: Partial<UserProfile>) => void;
+  logout: () => void;
+  destroyAccount: () => void;
 };
 
 export type UserProfile = {

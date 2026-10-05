@@ -1,14 +1,22 @@
 import { useStoredState, resetDemo } from "../state/storage"
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { useApp } from "../app-context"
 import Icon, { type IconName } from "../components/Icon"
 import Sheet from "../components/Sheet"
+import { myRole, resolveOwners, withChief } from "../data/owners"
+import type { DogOwner } from "../data/mock"
+import { DestroyAccountPage, PrivacyPage, RgpdPage, TermsPage } from "./SettingsPages"
+
+type SettingsPage = "terms" | "privacy" | "rgpd" | "destroy"
 
 export default function SettingsScreen() {
-  const { user } = useApp()
+  const { user, logout, destroyAccount } = useApp()
   const [resetOpen, setResetOpen] = useState(false)
+  const [logoutOpen, setLogoutOpen] = useState(false)
   const [editUser, setEditUser] = useState(false)
   const [inviteOpen, setInviteOpen] = useState(false)
+  const [page, setPage] = useState<SettingsPage | null>(null)
+  const closePage = () => setPage(null)
 
   const [locShare, setLocShare] = useStoredState("locShare", true)
   const [healthNotif, setHealthNotif] = useStoredState("healthNotif", true)
@@ -51,17 +59,32 @@ export default function SettingsScreen() {
       {/* legal */}
       <SectionTitle>Légal</SectionTitle>
       <div className="mb-6 divide-y divide-[var(--color-border)] overflow-hidden rounded-3xl border border-hairline bg-card">
-        <LinkRow icon="doc" label="Conditions d'utilisation" />
-        <LinkRow icon="shield" label="Politique de confidentialité" />
-        <LinkRow icon="doc" label="Licences open source" />
+        <LinkRow icon="doc" label="Conditions d'utilisation" onClick={() => setPage("terms")} />
+        <LinkRow icon="shield" label="Politique de confidentialité" onClick={() => setPage("privacy")} />
+        <LinkRow icon="lock" label="Données vétérinaires" hint="RGPD, export et archivage" onClick={() => setPage("rgpd")} />
+      </div>
+
+      <SectionTitle>Compte</SectionTitle>
+      <div className="mb-6 space-y-2">
+        <button className="w-full rounded-2xl border border-hairline bg-card p-3 text-sm font-semibold" onClick={() => setLogoutOpen(true)}>Se déconnecter</button>
+        <button className="w-full rounded-2xl border border-alert/40 bg-card p-3 text-sm font-semibold text-alert" onClick={() => setPage("destroy")}>Détruire le compte</button>
       </div>
 
       <p className="text-center text-[12px] text-muted-foreground/70">Pawrise · Version 1.0.0</p>
 
       <button className="my-4 w-full rounded-2xl border border-hairline p-3 text-sm" onClick={() => setResetOpen(true)}>Réinitialiser la démonstration</button>
+      <Sheet open={logoutOpen} onClose={() => setLogoutOpen(false)} title="Se déconnecter">
+        <p>Votre session se ferme sur cet appareil. Vous pourrez vous reconnecter avec votre e-mail et votre mot de passe.</p>
+        <button className="mt-4 rounded-2xl bg-primary p-3 text-primary-foreground" onClick={logout}>Se déconnecter</button>
+        <button className="ml-3" onClick={() => setLogoutOpen(false)}>Annuler</button>
+      </Sheet>
       <Sheet open={resetOpen} onClose={() => setResetOpen(false)} title="Réinitialiser la démonstration"><p>Les chiens, messages, rappels et rendez-vous enregistrés sur cet appareil seront effacés.</p><button className="mt-4 rounded-2xl bg-primary p-3 text-primary-foreground" onClick={resetDemo}>Effacer les données de démonstration</button><button className="ml-3" onClick={() => setResetOpen(false)}>Annuler</button></Sheet>
       {editUser && <UserEditSheet open onClose={() => setEditUser(false)} />}
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} />
+      {page === "terms" && <TermsPage onBack={closePage} />}
+      {page === "privacy" && <PrivacyPage onBack={closePage} />}
+      {page === "rgpd" && <RgpdPage onBack={closePage} />}
+      {page === "destroy" && <DestroyAccountPage onBack={closePage} onConfirm={destroyAccount} />}
     </div>
   )
 }
@@ -69,12 +92,28 @@ export default function SettingsScreen() {
 /* ---------- sharing / co-owners ---------- */
 
 function SharingSection({ onInvite }: { onInvite: () => void }) {
-  const { dogs, user } = useApp()
+  const { dogs, user, updateDog } = useApp()
+  const [transfer, setTransfer] = useState<{ dogId: string; email: string } | null>(null)
+  const transferDog = dogs.find((dog) => dog.id === transfer?.dogId)
+  const transferOwners = transferDog ? resolveOwners(transferDog, user) : []
+  const transferTarget = transferOwners.find((owner) => owner.email.toLowerCase() === transfer?.email.toLowerCase())
+
+  const giveChief = () => {
+    if (!transferDog || !transferTarget || transferTarget.pending) return
+    if (myRole(transferDog, user) !== "chief") return
+    updateDog(transferDog.id, { owners: withChief(transferOwners, transferTarget.email) })
+    setTransfer(null)
+  }
+
   return (
     <div className="mb-6">
       <div className="space-y-2">
         {dogs.map((d) => {
-          const coOwners = d.coOwners ?? []
+          const owners = resolveOwners(d, user)
+          const active = owners.filter((owner) => !owner.pending)
+          const mine = owners.find((owner) => owner.email.toLowerCase() === user.email.toLowerCase())
+          const iAmChief = mine?.role === "chief"
+          const seconds = owners.filter((owner) => !owner.pending && owner.role === "secondary")
           return (
             <div key={d.id} className="rounded-3xl border border-hairline bg-card p-3">
               <div className="flex items-center gap-3">
@@ -87,16 +126,39 @@ function SharingSection({ onInvite }: { onInvite: () => void }) {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[15px] font-semibold">{d.name}</p>
                   <p className="truncate text-[12px] text-muted-foreground">
-                    {coOwners.length + 1} propriétaire{coOwners.length + 1 > 1 ? "s" : ""}
+                    {active.length} propriétaire{active.length > 1 ? "s" : ""}
                   </p>
                 </div>
               </div>
               <div className="mt-2.5 space-y-1.5">
-                <OwnerRow label={user.name} sub="Vous · propriétaire" />
-                {coOwners.map((email) => (
-                  <OwnerRow key={email} label={email} sub="Invité · en attente" pending />
+                {owners.map((owner) => (
+                  <OwnerRow
+                    key={owner.email}
+                    owner={owner}
+                    you={owner.email.toLowerCase() === user.email.toLowerCase()}
+                    action={
+                      iAmChief && !owner.pending && owner.role === "secondary" ? (
+                        <button
+                          onClick={() => setTransfer({ dogId: d.id, email: owner.email })}
+                          className="mt-2 text-[13px] font-semibold text-primary"
+                        >
+                          Donner le rôle de chef
+                        </button>
+                      ) : null
+                    }
+                  />
                 ))}
               </div>
+              {iAmChief && seconds.length > 0 && (
+                <p className="mt-2 px-1 text-[12px] leading-snug text-muted-foreground">
+                  Vous êtes propriétaire chef. Seul le chef peut donner ce rôle à un autre propriétaire.
+                </p>
+              )}
+              {!iAmChief && (
+                <p className="mt-2 px-1 text-[12px] leading-snug text-muted-foreground">
+                  Seul le propriétaire chef peut donner ce rôle à un autre propriétaire.
+                </p>
+              )}
             </div>
           )
         })}
@@ -113,27 +175,60 @@ function SharingSection({ onInvite }: { onInvite: () => void }) {
           <span className="block text-[12px] text-muted-foreground">Partager l'accès à l'un de vos chiens</span>
         </span>
       </button>
+      <Sheet open={transfer !== null} onClose={() => setTransfer(null)} title="Rôle de chef">
+        <p className="text-[14px] leading-relaxed">
+          {transferTarget?.name} devient propriétaire chef de {transferDog?.name}. Vous devenez propriétaire second.
+        </p>
+        <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
+          Seul le propriétaire chef peut détruire les données du collier et le réinitialiser. Un propriétaire second peut détruire son compte, sans toucher au collier.
+        </p>
+        <button
+          onClick={giveChief}
+          className="mt-5 w-full rounded-2xl bg-primary py-4 text-[16px] font-bold text-primary-foreground active:scale-[0.99]"
+        >
+          Donner le rôle de chef
+        </button>
+        <button onClick={() => setTransfer(null)} className="mt-2 w-full rounded-2xl py-3 text-sm font-semibold text-muted-foreground">
+          Annuler
+        </button>
+      </Sheet>
     </div>
   )
 }
 
-function OwnerRow({ label, sub, pending }: { label: string; sub: string; pending?: boolean }) {
+function OwnerRow({ owner, you, action }: { owner: DogOwner; you: boolean; action?: ReactNode }) {
+  const pending = owner.pending
+  const badge = pending ? "En attente" : owner.role === "chief" ? "Chef" : "Second"
+  const sameAsEmail = owner.name.trim().toLowerCase() === owner.email.trim().toLowerCase()
+  const sub = pending ? "Invitation envoyée" : you ? "Vous" : sameAsEmail ? "" : owner.email
   return (
-    <div className="flex items-center gap-2.5 rounded-2xl bg-background/40 px-3 py-2">
-      <span
-        className="flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-bold"
-        style={
-          pending
-            ? { background: "var(--color-watch-soft)", color: "var(--color-watch)" }
-            : { background: "var(--color-primary)", color: "var(--color-primary-foreground)" }
-        }
-      >
-        {pending ? <Icon name="user" size={15} strokeWidth={2} /> : initials(label)}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[13.5px] font-medium">{label}</p>
-        <p className="truncate text-[11px] text-muted-foreground">{sub}</p>
+    <div className="rounded-2xl bg-background/40 px-3 py-2">
+      <div className="flex items-center gap-2.5">
+        <span
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[12px] font-bold"
+          style={
+            pending
+              ? { background: "var(--color-watch-soft)", color: "var(--color-watch)" }
+              : owner.role === "chief"
+                ? { background: "var(--color-primary)", color: "var(--color-primary-foreground)" }
+                : { background: "var(--color-elevated)", color: "var(--color-foreground)" }
+          }
+        >
+          {pending ? <Icon name="user" size={15} strokeWidth={2} /> : initials(owner.name)}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13.5px] font-medium">{owner.name}</p>
+          {sub && <p className="truncate text-[11px] text-muted-foreground">{sub}</p>}
+        </div>
+        <span
+          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+            pending ? "bg-watch-soft text-watch" : owner.role === "chief" ? "bg-primary text-primary-foreground" : "bg-elevated text-foreground"
+          }`}
+        >
+          {badge}
+        </span>
       </div>
+      {action}
     </div>
   )
 }
@@ -144,14 +239,17 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
   const [email, setEmail] = useState("")
   const [sent, setSent] = useState(false)
 
+  const dog = dogs.find((item) => item.id === dogId)
+  const owners = dog ? resolveOwners(dog, user) : []
   const normalized = email.trim().toLowerCase()
-  const duplicate = normalized === user.email.toLowerCase() || dogs.find(d => d.id === dogId)?.coOwners?.some(e => e.toLowerCase() === normalized)
+  const duplicate = owners.some((owner) => owner.email.toLowerCase() === normalized)
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized) && !duplicate
 
   const send = () => {
-    const dog = dogs.find((d) => d.id === dogId)
     if (!dog || !valid) return
-    updateDog(dog.id, { coOwners: [...(dog.coOwners ?? []), normalized] })
+    updateDog(dog.id, {
+      owners: [...owners, { name: normalized, email: normalized, role: "secondary" }],
+    })
     setSent(true)
   }
 
@@ -173,7 +271,7 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
           </span>
           <h3 className="text-[18px] font-bold">Invitation envoyée</h3>
           <p className="mt-2 max-w-[16rem] text-[13.5px] leading-snug text-muted-foreground">
-            {email.trim()} a été ajouté aux invitations de {dogs.find((d) => d.id === dogId)?.name}.
+            {email.trim()} est propriétaire second de {dogs.find((d) => d.id === dogId)?.name}.
           </p>
           <button
             onClick={close}
@@ -185,8 +283,7 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
       ) : (
         <>
           <p className="mb-4 text-[13.5px] leading-snug text-muted-foreground">
-            Un chien peut avoir plusieurs propriétaires. La personne invitée aura accès à la localisation et à la santé
-            du chien sélectionné.
+            La personne invitée aura accès à la localisation et à la santé, comme propriétaire second. Seul le propriétaire chef peut lui donner ce rôle.
           </p>
 
           <span className="mb-2 block px-1 text-[12px] font-semibold text-muted-foreground">Chien à partager</span>
@@ -245,7 +342,7 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
 
 /* ---------- small building blocks ---------- */
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function SectionTitle({ children }: { children: ReactNode }) {
   return <h2 className="mb-2 px-1 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">{children}</h2>
 }
 
@@ -288,16 +385,18 @@ function ToggleRow({
   )
 }
 
-function LinkRow({ icon, label }: { icon: IconName; label: string }) {
-  const [open, setOpen] = useState(false)
+function LinkRow({ icon, label, hint, onClick }: { icon: IconName; label: string; hint?: string; onClick: () => void }) {
   return (
-    <><button onClick={() => setOpen(true)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-elevated">
+    <button onClick={onClick} className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-elevated">
       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-elevated text-muted-foreground">
         <Icon name={icon} size={18} strokeWidth={2} />
       </span>
-      <span className="flex-1 text-[14px]">{label}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[14px]">{label}</span>
+        {hint && <span className="block text-[11.5px] text-muted-foreground">{hint}</span>}
+      </span>
       <Icon name="chevron-right" size={17} strokeWidth={2.2} className="text-muted-foreground" />
-    </button><Sheet open={open} onClose={() => setOpen(false)} title={label}><p className="text-sm leading-relaxed">{label === "Licences open source" ? "React, Vite et Tailwind CSS : licences MIT. Les dépendances et leurs notices sont conservées dans le projet. Photos : Unsplash. Polices : Google Fonts." : "Pawrise accompagne le suivi de votre chien : santé, localisation, collier et rendez-vous. Les données de cet appareil restent sur cet appareil. Les photos et polices en ligne proviennent d’Unsplash et Google Fonts."}</p></Sheet></>
+    </button>
   )
 }
 
