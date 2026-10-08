@@ -1,7 +1,7 @@
-type Props = { x: number; y: number; photo: string; stale?: boolean }
+type Props = { x: number; y: number; photo: string; stale?: boolean; alert?: boolean }
 
-export default function DogMarker({ x, y, photo, stale }: Props) {
-  const ring = stale ? "var(--color-watch)" : "var(--color-primary)"
+export default function DogMarker({ x, y, photo, stale, alert }: Props) {
+  const ring = alert ? "var(--color-alert)" : stale ? "var(--color-watch)" : "var(--color-primary)"
   return (
     <div className="absolute" style={{ left: x, top: y, transform: "translate(-50%, -50%)" }}>
       {/* accuracy halo */}

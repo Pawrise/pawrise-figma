@@ -63,7 +63,7 @@ export default function HealthScreen() {
     <div className="relative h-full">
       <div
         className="flex h-full min-h-0 flex-col px-4 pb-3"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 12px)" }}
+        style={{ paddingTop: "calc(var(--pw-safe-top) + 12px)" }}
       >
         {!dog.connected && (
           <p role="status" className="mb-2 shrink-0 text-sm text-watch">

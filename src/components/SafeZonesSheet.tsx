@@ -12,6 +12,7 @@ type Props = {
   setZones: (updater: (z: SafeZone[]) => SafeZone[]) => void
   selectedId: string | null
   onSelect: (id: string | null) => void
+  leftZoneId?: string | null
 }
 
 
@@ -23,6 +24,7 @@ export default function SafeZonesSheet({
   setZones,
   selectedId,
   onSelect,
+  leftZoneId = null,
 }: Props) {
   const { currentDog: dog } = useApp()
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -65,6 +67,7 @@ export default function SafeZonesSheet({
       <div className="space-y-3">
         {zones.map((z) => {
           const inside = Math.hypot(position.x - z.x, position.y - z.y) <= z.radius
+          const left = !inside && leftZoneId === z.id
           const selected = selectedId === z.id
           return (
             <div
@@ -105,10 +108,14 @@ export default function SafeZonesSheet({
                   )}
                   <span
                     className="mt-0.5 inline-flex items-center gap-1 text-[11.5px] font-medium"
-                    style={{ color: inside ? "var(--color-good)" : "var(--color-watch)" }}
+                    style={{ color: inside ? "var(--color-good)" : left ? "var(--color-alert)" : "var(--color-watch)" }}
                   >
                     <Icon name={inside ? "check" : "alert"} size={12} strokeWidth={2.4} />
-                    {inside ? `${dog.name} est à l’intérieur` : `${dog.name} n’est pas dans cette zone`}
+                    {inside
+                      ? `${dog.name} est à l’intérieur`
+                      : left
+                        ? `${dog.name} a quitté cette zone`
+                        : `${dog.name} n’est pas dans cette zone`}
                   </span>
                 </div>
                 <button aria-label={`Renommer ${z.label}`} onClick={() => setEditingId(z.id)}><Icon name="pencil" size={16} /></button>

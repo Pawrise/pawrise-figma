@@ -8,7 +8,7 @@ import SafeZonesSheet from "../components/SafeZonesSheet"
 import AlertBanner from "../components/AlertBanner"
 import Icon from "../components/Icon"
 import { useStoredState } from "../state/storage"
-import { dogPosition, initialSafeZones, trail, type SafeZone } from "../data/mock"
+import { dogPosition, initialSafeZones, positionOutsideZone, trail, zoneExitTrail, type SafeZone } from "../data/mock"
 
 export default function GpsScreen() {
   const { anomaly, askPawriseAboutAlert, currentDog: dog } = useApp()
@@ -26,6 +26,23 @@ export default function GpsScreen() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedZone, setSelectedZone] = useState<string | null>("home")
   const [alertDismissed, setAlertDismissed] = useState(false)
+
+  const contains = (zone: SafeZone, point: { x: number; y: number }) =>
+    Math.hypot(point.x - zone.x, point.y - zone.y) <= zone.radius
+  const leftZone = anomaly ? (zones.find((zone) => contains(zone, pos)) ?? zones[0] ?? null) : null
+  const displayPos = leftZone ? positionOutsideZone(leftZone) : pos
+  const trailPoints = leftZone ? zoneExitTrail(pos, displayPos) : history
+  const mapFocus = leftZone
+    ? {
+        x: leftZone.x + (displayPos.x - leftZone.x) * 0.38,
+        y: Math.min(leftZone.y, displayPos.y) - 120,
+      }
+    : displayPos
+  const leftZoneId = leftZone?.id ?? null
+
+  useEffect(() => {
+    if (leftZoneId) setSelectedZone(leftZoneId)
+  }, [leftZoneId])
 
   const secondsAgo = Math.max(0, Math.floor((now - lastUpdate) / 1000))
 
@@ -46,22 +63,26 @@ export default function GpsScreen() {
     refreshTimer.current = setTimeout(() => {
       setStale(false)
       setLastUpdate(Date.now())
-      setHistory(points => [...points.slice(-19), pos])
+      if (!anomaly) setHistory(points => [...points.slice(-19), pos])
       setRefreshing(false)
     }, 1100)
   }
 
-  const showAlert = anomaly && !alertDismissed
+  const showAlert = !!leftZone && !alertDismissed
 
   return (
     <div className="relative h-full w-full">
-      <MapCanvas focus={pos} onApi={(api) => (apiRef.current = api)}>
+      <MapCanvas
+        focus={mapFocus}
+        recenterScale={leftZone ? 0.9 : 1.6}
+        onApi={(api) => (apiRef.current = api)}
+      >
         {/* breadcrumb trail */}
         <svg className="pointer-events-none absolute inset-0" width={1000} height={1000}>
           <polyline
-            points={(showHistory ? history : []).map((p) => `${p.x},${p.y}`).join(" ")}
+            points={(showHistory ? trailPoints : []).map((p) => `${p.x},${p.y}`).join(" ")}
             fill="none"
-            stroke="var(--color-primary)"
+            stroke={leftZone ? "var(--color-alert)" : "var(--color-primary)"}
             strokeWidth={4}
             strokeLinecap="round"
             strokeDasharray="2 12"
@@ -70,41 +91,52 @@ export default function GpsScreen() {
 
         {/* safe zone overlays */}
         {zones
-          .filter((z) => !selectedZone || z.id === selectedZone)
-          .map((z) => (
-            <div
-              key={z.id}
-              className="pointer-events-none absolute rounded-full"
-              style={{
-                left: z.x,
-                top: z.y,
-                width: z.radius * 2,
-                height: z.radius * 2,
-                transform: "translate(-50%, -50%)",
-                border: "2px solid var(--color-primary)",
-                background: "var(--color-good-soft)",
-              }}
-            >
-              <span className="absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap rounded-full bg-background/80 px-2 py-0.5 text-[11px] font-semibold text-primary">
-                {z.emoji} {z.label}
-              </span>
-            </div>
-          ))}
+          .filter((z) => z.id === leftZone?.id || !selectedZone || z.id === selectedZone)
+          .map((z) => {
+            const breached = leftZone?.id === z.id
+            return (
+              <div
+                key={z.id}
+                className="pointer-events-none absolute rounded-full"
+                style={{
+                  left: z.x,
+                  top: z.y,
+                  width: z.radius * 2,
+                  height: z.radius * 2,
+                  transform: "translate(-50%, -50%)",
+                  border: breached ? "2.5px solid var(--color-alert)" : "2px solid var(--color-primary)",
+                  background: breached ? "var(--color-alert-soft)" : "var(--color-good-soft)",
+                  boxShadow: breached ? "0 0 0 8px var(--color-alert-soft)" : undefined,
+                }}
+              >
+                <span
+                  className="absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap rounded-full bg-background/80 px-2 py-0.5 text-[11px] font-semibold"
+                  style={{ color: breached ? "var(--color-alert)" : "var(--color-primary)" }}
+                >
+                  {z.emoji} {z.label}{breached ? " · sortie" : ""}
+                </span>
+              </div>
+            )
+          })}
 
-        <DogMarker x={pos.x} y={pos.y} photo={dog.photo} stale={stale || !dog.connected} />
+        <DogMarker x={displayPos.x} y={displayPos.y} photo={dog.photo} stale={stale || !dog.connected} alert={!!leftZone} />
       </MapCanvas>
 
       {/* top overlay */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 z-20 space-y-3 px-4"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}
+        style={{ paddingTop: "calc(var(--pw-safe-top) + 14px)" }}
       >
         <div className="pointer-events-auto">
-          <StatusCard secondsAgo={secondsAgo} stale={stale || !dog.connected} />
+          <StatusCard secondsAgo={secondsAgo} stale={stale || !dog.connected} zoneName={leftZone?.label} />
         </div>
-        {showAlert && (
+        {showAlert && leftZone && (
           <div className="pointer-events-auto">
-            <AlertBanner onOpen={askPawriseAboutAlert} onDismiss={() => setAlertDismissed(true)} />
+            <AlertBanner
+              message={`${dog.name} a quitté la zone de sécurité ${leftZone.label}.`}
+              onOpen={() => askPawriseAboutAlert(leftZone.label)}
+              onDismiss={() => setAlertDismissed(true)}
+            />
           </div>
         )}
       </div>
@@ -129,8 +161,16 @@ export default function GpsScreen() {
           onClick={() => setSheetOpen(true)}
           className="flex items-center gap-2 rounded-full border border-hairline bg-card/85 px-5 py-3 text-sm font-semibold shadow-2xl backdrop-blur-xl active:scale-95"
         >
-          <Icon name="shield" size={18} strokeWidth={2.2} className="text-primary" />
+          <Icon name="shield" size={18} strokeWidth={2.2} className={leftZone ? "text-alert" : "text-primary"} />
           Zones de sécurité
+          {leftZone && (
+            <span
+              className="rounded-full px-2 py-0.5 text-[11px] font-bold"
+              style={{ background: "var(--color-alert-soft)", color: "var(--color-alert)" }}
+            >
+              Sortie
+            </span>
+          )}
           <span className="rounded-full bg-elevated px-2 py-0.5 font-mono text-[11px] text-muted-foreground">
             {zones.length}
           </span>
@@ -138,13 +178,14 @@ export default function GpsScreen() {
       </div>
 
       <SafeZonesSheet
-        position={pos}
+        position={displayPos}
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         zones={zones}
         setZones={setZonesState}
         selectedId={selectedZone}
         onSelect={setSelectedZone}
+        leftZoneId={leftZone?.id}
       />
     </div>
   )

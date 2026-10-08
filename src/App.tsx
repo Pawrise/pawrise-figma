@@ -14,6 +14,7 @@ import CarePanels from "./components/care/CarePanels"
 import AddDogFlow from "./dogs/AddDogFlow"
 import AuthScreen from "./auth/AuthScreen"
 import LearnFlow from "./auth/LearnFlow"
+import PhoneFrame from "./components/PhoneFrame"
 import { asSetup, findAccount, seedAccount, type Account, type Setup } from "./auth/accounts"
 
 export default function App() {
@@ -125,8 +126,8 @@ export default function App() {
     return null
   }, [])
 
-  const askPawriseAboutAlert = useCallback(() => {
-    chat.seedAlert()
+  const askPawriseAboutAlert = useCallback((zone?: string) => {
+    chat.seedAlert(zone)
     setTab("chat")
   }, [chat])
 
@@ -174,29 +175,26 @@ export default function App() {
 
   return (
     <AppContext.Provider value={value}>
-      {/* Phone-shaped app shell, centered on larger canvases but full-bleed on phones. */}
-      <div className="flex h-full w-full justify-center bg-background">
-        <div id="pawrise-shell" className="relative flex h-full w-full max-w-[440px] flex-col overflow-hidden bg-background">
-          {storageError && <p role="alert" className="bg-watch-soft p-2 text-xs">La sauvegarde locale est indisponible ou pleine. Vos modifications restent dans cette session.</p>}
-          <main className="relative min-h-0 flex-1">
-            {showApp && tab === "health" && <HealthScreen key={currentDog.id} />}
-            {showApp && tab === "map" && <GpsScreen key={currentDog.id} />}
-            {showApp && tab === "chat" && <ChatScreen />}
-            {showApp && tab === "vet" && <VetScreen />}
-            {showApp && tab === "profile" && <SettingsScreen />}
-          </main>
-          {showApp && <TabBar />}
-          {showApp && <CarePanels panel={panel} onClose={() => openPanel(null)} />}
-          {!loggedIn && <AuthScreen accounts={accounts} onLogin={login} onSignup={signup} />}
-          {showLearn && <LearnFlow onDone={() => setSetup("collar")} />}
-          {showDogFlow && (
-            <AddDogFlow
-              onLeave={dogs.length === 0 ? () => { setSetup("learn"); setAddingDog(false) } : undefined}
-              onComplete={setup === "collar" ? () => setSetup("done") : undefined}
-            />
-          )}
-        </div>
-      </div>
+      <PhoneFrame>
+        {storageError && <p role="alert" className="bg-watch-soft p-2 text-xs">La sauvegarde locale est indisponible ou pleine. Vos modifications restent dans cette session.</p>}
+        <main className="relative min-h-0 flex-1">
+          {showApp && tab === "health" && <HealthScreen key={currentDog.id} />}
+          {showApp && tab === "map" && <GpsScreen key={currentDog.id} />}
+          {showApp && tab === "chat" && <ChatScreen />}
+          {showApp && tab === "vet" && <VetScreen />}
+          {showApp && tab === "profile" && <SettingsScreen />}
+        </main>
+        {showApp && <TabBar />}
+        {showApp && <CarePanels panel={panel} onClose={() => openPanel(null)} />}
+        {!loggedIn && <AuthScreen accounts={accounts} onLogin={login} onSignup={signup} />}
+        {showLearn && <LearnFlow onDone={() => setSetup("collar")} />}
+        {showDogFlow && (
+          <AddDogFlow
+            onLeave={dogs.length === 0 ? () => { setSetup("learn"); setAddingDog(false) } : undefined}
+            onComplete={setup === "collar" ? () => setSetup("done") : undefined}
+          />
+        )}
+      </PhoneFrame>
     </AppContext.Provider>
   )
 }

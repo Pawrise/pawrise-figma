@@ -24,7 +24,7 @@ export default function TabBar() {
   return (
     <nav
       className="relative z-30 flex shrink-0 items-stretch justify-around border-t border-border bg-background/85 px-2 pt-2 backdrop-blur-xl"
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 10px)" }}
+      style={{ paddingBottom: "calc(var(--pw-safe-bottom) + 10px)" }}
     >
       {TABS.map((t) => {
         const active = tab === t.id

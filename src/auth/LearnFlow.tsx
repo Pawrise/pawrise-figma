@@ -41,7 +41,7 @@ export default function LearnFlow({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background" style={{ animation: "pw-rise 240ms ease-out" }}>
-      <header className="px-4 pb-3" style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}>
+      <header className="px-4 pb-3" style={{ paddingTop: "calc(var(--pw-safe-top) + 14px)" }}>
         <div className="mb-4 flex items-center gap-3">
           {step > 0 ? (
             <button
@@ -99,7 +99,7 @@ export default function LearnFlow({ onDone }: { onDone: () => void }) {
         <p className="mt-3 max-w-[20rem] text-[15px] leading-snug text-muted-foreground">{current.hint}</p>
       </div>
 
-      <footer className="px-5 pt-3" style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}>
+      <footer className="px-5 pt-3" style={{ paddingBottom: "calc(var(--pw-safe-bottom) + 16px)" }}>
         <button
           onClick={() => (last ? onDone() : setStep((value) => value + 1))}
           className="w-full rounded-2xl bg-primary py-4 text-[16px] font-bold text-primary-foreground active:scale-[0.99]"

@@ -9,9 +9,9 @@ function formatRecency(seconds: number) {
   return `il y a ${h} h`
 }
 
-type Props = { secondsAgo: number; stale: boolean }
+type Props = { secondsAgo: number; stale: boolean; zoneName?: string | null }
 
-export default function StatusCard({ secondsAgo, stale }: Props) {
+export default function StatusCard({ secondsAgo, stale, zoneName }: Props) {
   const { currentDog: dog } = useApp()
   const collar = dog
   const battery = dog.battery
@@ -69,6 +69,16 @@ export default function StatusCard({ secondsAgo, stale }: Props) {
           <span className="font-mono text-[10px] text-muted-foreground">{dog.collarId}</span>
         </div>
       </div>
+
+      {zoneName && (
+        <div
+          className="mt-3 flex items-start gap-2 rounded-2xl px-3 py-2 text-[12.5px] font-medium leading-snug"
+          style={{ background: "var(--color-alert-soft)", color: "var(--color-alert)" }}
+        >
+          <Icon name="alert" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0" />
+          <span>{dog.name} a quitté la zone de sécurité {zoneName}.</span>
+        </div>
+      )}
 
       {stale && (
         <div

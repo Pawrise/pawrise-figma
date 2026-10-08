@@ -5,7 +5,7 @@ import Icon from "./Icon"
 export default function InfoPage({ title, onBack, children }: { title: string; onBack: () => void; children: ReactNode }) {
   const page = (
     <div className="absolute inset-0 z-50 flex flex-col bg-background" style={{ animation: "pw-rise 240ms ease-out" }}>
-      <header className="px-4 pb-2" style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}>
+      <header className="px-4 pb-2" style={{ paddingTop: "calc(var(--pw-safe-top) + 14px)" }}>
         <button
           onClick={onBack}
           className="flex items-center gap-1 rounded-full py-1 pr-3 text-[15px] font-semibold text-primary active:opacity-70"

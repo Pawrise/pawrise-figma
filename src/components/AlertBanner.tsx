@@ -1,10 +1,15 @@
 import { useApp } from "../app-context"
 import Icon from "./Icon"
 
-type Props = { onOpen: () => void; onDismiss: () => void }
+type Props = {
+  onOpen: () => void
+  onDismiss: () => void
+  title?: string
+  message?: string
+}
 
-// Collar alert. Tapping it opens the contextual Chat.
-export default function AlertBanner({ onOpen, onDismiss }: Props) {
+// Zone alert. Tapping it opens the contextual Chat.
+export default function AlertBanner({ onOpen, onDismiss, title = "Alerte de zone", message }: Props) {
   const { currentDog } = useApp()
   return (
     <div
@@ -20,10 +25,10 @@ export default function AlertBanner({ onOpen, onDismiss }: Props) {
       </span>
       <button onClick={onOpen} className="min-w-0 flex-1 text-left">
         <span className="block text-[10.5px] font-bold uppercase tracking-wider" style={{ color: "var(--color-alert)" }}>
-          Alerte du collier
+          {title}
         </span>
         <span className="block text-[13.5px] font-medium leading-snug text-foreground">
-          Une variation inhabituelle a été détectée chez {currentDog.name}.
+          {message ?? `${currentDog.name} a quitté la zone de sécurité.`}
         </span>
         <span className="mt-0.5 flex items-center gap-1 text-[11.5px]" style={{ color: "var(--color-alert)" }}>
           Toucher pour demander à Pawrise <Icon name="chevron-right" size={12} strokeWidth={2.6} />

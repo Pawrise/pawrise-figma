@@ -33,7 +33,7 @@ En tant que propriétaire, je veux ajouter, renommer, redimensionner, afficher e
 En tant que propriétaire, je veux ouvrir le chat, utiliser les suggestions ou écrire librement, afin d’obtenir un point sur mon chien.
 
 **US-09 — Continuer après une alerte collier**  
-En tant que propriétaire, je veux toucher la bannière d’alerte sur la carte, afin d’arriver dans le chat avec le contexte déjà posé.
+En tant que propriétaire, je veux toucher la bannière d’alerte sur la carte, afin d’arriver dans le chat avec le contexte déjà posé. Lorsque l’alerte est active depuis Santé, la carte montre que le chien a quitté une zone de sécurité.
 
 **US-10 — Contacter un vétérinaire depuis le chat**  
 En tant que propriétaire, je veux passer aux rendez-vous depuis la conversation, afin de réserver sans quitter le fil d’alerte.

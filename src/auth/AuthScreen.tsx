@@ -62,8 +62,8 @@ function Welcome({
     <div
       className="flex flex-1 flex-col px-6"
       style={{
-        paddingTop: "calc(env(safe-area-inset-top) + 48px)",
-        paddingBottom: "calc(env(safe-area-inset-bottom) + 24px)",
+        paddingTop: "calc(var(--pw-safe-top) + 48px)",
+        paddingBottom: "calc(var(--pw-safe-bottom) + 24px)",
       }}
     >
       <div className="flex flex-1 flex-col items-center justify-center text-center">
@@ -275,7 +275,7 @@ function FormShell({
     <div className="flex flex-1 flex-col">
       <header
         className="px-4"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}
+        style={{ paddingTop: "calc(var(--pw-safe-top) + 14px)" }}
       >
         <button
           onClick={onBack}

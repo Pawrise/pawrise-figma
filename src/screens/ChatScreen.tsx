@@ -21,7 +21,7 @@ export default function ChatScreen() {
       {/* header */}
       <header
         className="z-10 flex items-center gap-3 border-b border-hairline bg-background/90 px-4 pb-3 backdrop-blur-xl"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}
+        style={{ paddingTop: "calc(var(--pw-safe-top) + 14px)" }}
       >
         <img
           src={dog.photo}

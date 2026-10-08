@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { alertSeed, greeting, pawriseReply, uid, type ChatMessage, type QuickReply } from "./scripts"
+import { alertSeed, greeting, pawriseReply, uid, zoneExitSeed, type ChatMessage, type QuickReply } from "./scripts"
 import type { Dog } from "../data/mock"
 import { useStoredState } from "../state/storage"
 export function useChat(dog: Dog, anomaly: boolean) {
@@ -23,7 +23,7 @@ export function useChat(dog: Dog, anomaly: boolean) {
     messages: threads[dog.id] ?? [greeting(dog)], isTyping: (pending[dog.id] ?? 0) > 0,
     selectQuick: (reply: QuickReply) => respond(reply.label, reply.key),
     sendText: (text: string) => respond(text, text.toLowerCase()),
-    seedAlert: () => append(alertSeed(dog)),
+    seedAlert: (zone?: string) => append(zone ? zoneExitSeed(dog, zone) : alertSeed(dog)),
   }
 }
 export type ChatController = ReturnType<typeof useChat>

@@ -25,7 +25,7 @@ export default function SettingsScreen() {
   return (
     <div
       className="no-scrollbar h-full overflow-y-auto px-4 pb-6"
-      style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}
+      style={{ paddingTop: "calc(var(--pw-safe-top) + 14px)" }}
     >
       <h1 className="mb-5 text-[26px] font-bold">Paramètres</h1>
 
