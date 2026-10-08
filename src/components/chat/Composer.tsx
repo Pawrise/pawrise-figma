@@ -13,7 +13,7 @@ export default function Composer({ onSend }: { onSend: (text: string) => void })
   return (
     <div
       className="shrink-0 border-t border-hairline bg-background/90 px-3 pt-3 backdrop-blur-xl"
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)" }}
+      style={{ paddingBottom: "calc(var(--pw-safe-bottom) + 8px)" }}
     >
       <div className="flex items-center gap-2 rounded-full border border-hairline bg-card px-4 py-1.5">
         <input

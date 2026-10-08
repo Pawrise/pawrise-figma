@@ -16,7 +16,7 @@ export type AppState = {
   setAnomaly: (v: boolean) => void;
   chat: ChatController;
   // Seed the contextual alert conversation and jump to the Chat tab.
-  askPawriseAboutAlert: () => void;
+  askPawriseAboutAlert: (zone?: string) => void;
 
   // Multi-dog support.
   dogs: Dog[];

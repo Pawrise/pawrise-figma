@@ -104,7 +104,7 @@ export default function AddDogFlow({ onLeave, onComplete }: { onLeave?: () => vo
       {/* header: back + progress + close */}
       <header
         className="flex items-center gap-3 px-4 pb-3"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}
+        style={{ paddingTop: "calc(var(--pw-safe-top) + 14px)" }}
       >
         <button
           onClick={goBack}
@@ -154,7 +154,7 @@ export default function AddDogFlow({ onLeave, onComplete }: { onLeave?: () => vo
       {pairError && <p role="alert" className="px-5 text-sm text-watch">{pairError}</p>}
       {!canNext && <p className="px-5 text-xs text-muted-foreground">Renseignez une valeur valide pour continuer.</p>}
       {/* footer action */}
-      <footer className="px-5 pt-3" style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}>
+      <footer className="px-5 pt-3" style={{ paddingBottom: "calc(var(--pw-safe-bottom) + 16px)" }}>
         {phase === "profile" && step !== "summary" && (
           <PrimaryButton disabled={!canNext} onClick={next}>
             Suivant

@@ -19,6 +19,7 @@ export type MapApi = {
 
 type Props = {
   focus: { x: number; y: number } // point to recenter on (the dog)
+  recenterScale?: number
   onApi?: (api: MapApi) => void
   children?: ReactNode // rendered in map-space, positioned via left/top in world px
 }
@@ -26,7 +27,7 @@ type Props = {
 const MIN = 0.8
 const MAX = 3.2
 
-export default function MapCanvas({ focus, onApi, children }: Props) {
+export default function MapCanvas({ focus, recenterScale = 1.6, onApi, children }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useState({ x: 0, y: 0, scale: 1.4 })
   const drag = useRef<{ px: number; py: number; ox: number; oy: number } | null>(null)
@@ -42,14 +43,13 @@ export default function MapCanvas({ focus, onApi, children }: Props) {
   )
 
   const recenter = useCallback(() => {
-    setView(centerOn(1.6, focus.x, focus.y))
-  }, [centerOn, focus.x, focus.y])
+    setView(centerOn(recenterScale, focus.x, focus.y))
+  }, [centerOn, focus.x, focus.y, recenterScale])
 
-  // Center on the dog once we know the container size.
+  // Reframe when the dog moves (calm position vs sortie de zone).
   useLayoutEffect(() => {
     recenter()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [recenter])
 
   const zoomBy = useCallback((factor: number) => {
     const el = wrapRef.current

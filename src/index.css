@@ -182,6 +182,157 @@
 }
 
 :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+
+/*
+ * iPhone 17 frame. The glass box matches the inner opening of
+ * public/assets/iphone17_frame.svg (viewBox 1520×3068, screen 100,100 → 1420,2968).
+ * On a narrow or short viewport the frame drops away and the app is full-bleed.
+ */
+.phone-stage {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 32px 28px;
+  overflow: hidden;
+  background-color: var(--pw-color-border);
+  background-image: radial-gradient(ellipse at 50% 38%, var(--pw-color-surface-page), transparent 68%);
+}
+
+.phone-device {
+  position: relative;
+  flex: none;
+  width: min(100%, calc((100svh - 64px) * 1520 / 3068));
+  aspect-ratio: 1520 / 3068;
+  container-type: inline-size;
+  filter: drop-shadow(0 22px 44px rgb(18 48 68 / 20%));
+}
+
+.phone-clip {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.phone-screen {
+  position: absolute;
+  z-index: 1;
+  left: calc(100 / 1520 * 100% - 1px);
+  top: calc(100 / 3068 * 100% - 1px);
+  width: calc(1320 / 1520 * 100% + 2px);
+  height: calc(2868 / 3068 * 100% + 2px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-background);
+  clip-path: url(#pawrise-screen-clip);
+}
+
+.phone-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  -webkit-mask-image: url("/assets/iphone17_screen_mask.svg");
+  mask-image: url("/assets/iphone17_screen_mask.svg");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
+}
+
+.phone-statusbar {
+  position: absolute;
+  z-index: 70;
+  top: 6.45cqw;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6.5cqw;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--pw-color-brand-ink);
+  font-family: var(--font-sans);
+  font-size: 3.24cqw;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.phone-statusbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.38em;
+}
+
+.phone-statusbar-icons svg {
+  display: block;
+  height: 0.78em;
+  width: auto;
+}
+
+.phone-home {
+  position: absolute;
+  z-index: 70;
+  bottom: 1.7cqw;
+  left: 50%;
+  width: 29cqw;
+  height: 1.05cqw;
+  transform: translateX(-50%);
+  pointer-events: none;
+  border-radius: 999px;
+  background: var(--pw-color-brand-ink);
+}
+
+#pawrise-shell {
+  --pw-safe-top: env(safe-area-inset-top, 0px);
+  --pw-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (min-width: 721px) and (min-height: 681px) {
+  #pawrise-shell {
+    --pw-safe-top: 10.86cqw;
+    --pw-safe-bottom: 7.38cqw;
+  }
+}
+
+@media (max-width: 720px), (max-height: 680px) {
+  .phone-stage {
+    padding: 0;
+    background: var(--color-background);
+  }
+
+  .phone-device {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    filter: none;
+  }
+
+  .phone-screen {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: none;
+  }
+
+  .phone-frame,
+  .phone-statusbar,
+  .phone-home {
+    display: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

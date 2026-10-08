@@ -92,6 +92,22 @@ export const trail = [
   { x: 512, y: 470 },
 ];
 
+// Place the dog just outside a safe zone, to the east, still on the map.
+export function positionOutsideZone(zone: { x: number; y: number; radius: number }) {
+  return { x: Math.min(940, Math.round(zone.x + zone.radius + 78)), y: zone.y };
+}
+
+export function zoneExitTrail(from: { x: number; y: number }, to: { x: number; y: number }) {
+  const steps = 4;
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const t = i / steps;
+    return {
+      x: Math.round(from.x + (to.x - from.x) * t),
+      y: Math.round(from.y + (to.y - from.y) * t),
+    };
+  });
+}
+
 // Breed list — ordered for the prototype: unknown, mixed, then alphabetical.
 // Designed to scale to a much larger database.
 export const breeds = [
